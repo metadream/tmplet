@@ -1,6 +1,6 @@
 {
   "name": "tmplet",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A compact, high-performance and full-featured template engine.",
   "license": "MIT",
   "author": "Ai Chen",
