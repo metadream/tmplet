@@ -116,7 +116,7 @@ function include(file) {
   let tmpl = readFileSync(resolve(options.root, file), "utf-8");
   while (syntax.PARTIAL.test(tmpl)) {
     tmpl = tmpl.replace(syntax.PARTIAL, (_, _file) => {
-      return readFileSync(resolve(options, _file), "utf-8");
+      return readFileSync(resolve(options.root, _file), "utf-8");
     });
   }
   return tmpl;
