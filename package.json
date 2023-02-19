@@ -1,0 +1,15 @@
+{
+  "name": "tmplet",
+  "version": "1.0.0",
+  "description": "A compact, high-performance and full-featured template engine.",
+  "license": "MIT",
+  "author": "Ai Chen",
+  "homepage": "https://github.com/metadream",
+  "repository": "https://github.com/metadream/tmplet.js.git",
+  "main": "tmplet.js",
+  "keywords": [
+    "template",
+    "template-engine",
+    "template-js"
+  ]
+}
