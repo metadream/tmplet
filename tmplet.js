@@ -22,7 +22,7 @@ const syntax = {
 const variable = {
   REMOVE: /\/\*[\w\W]*?\*\/|\/\/[^\n]*\n|\/\/[^\n]*$|"(?:[^"\\]|\\[\w\W])*"|'(?:[^'\\]|\\[\w\W])*'|\s*\.\s*[$\w\.]+/g,
   SPLIT: /[^\w$]+/g,
-  KEYWORDS: /\b(await|async|then|break|case|catch|continue|debugger|default|delete|do|else|false|finally|for|of|function|if|in|instanceof|new|null|return|switch|this|throw|true|try|typeof|var|void|while|with|abstract|boolean|byte|char|class|const|double|enum|export|extends|final|float|goto|implements|import|int|interface|long|native|package|private|protected|public|short|static|super|synchronized|throws|transient|volatile|arguments|let|yield|undefined)\b/g,
+  KEYWORDS: /\b(abstract|arguments|async|await|boolean|break|byte|case|catch|char|class|const|continue|debugger|default|delete|do|double|else|enum|eval|export|extends|false|final|finally|float|for|function|goto|if|implements|import|in|instanceof|int|interface|let|long|native|new|null|of|package|private|protected|public|return|short|static|super|switch|synchronized|then|this|throw|throws|transient|true|try|typeof|undefined|var|void|volatile|while|with|yield|parseInt|parseFloat|decodeURI|decodeURIComponent|encodeURI|encodeURIComponent|isFinite|isNaN|Array|ArrayBuffer|Object|Function|Math|Date|Boolean|String|RegExp|Map|Set|JSON|Promise|Reflect|Number|BigInt|Infinity|Error|NaN)\b/g,
   NUMBER: /^\d[^,]*|,\d[^,]*/g,
   BOUNDARY: /^,+|,+$/g,
   SPLIT2: /^$|,+/
