@@ -30,7 +30,6 @@ const variable = {
 
 // Template engine options
 const options = {
-  compress: true,
   root: "",
   imports: {}
 }
@@ -52,24 +51,31 @@ function init(_options) {
  * @returns {Function}
  */
 function compile(tmpl) {
-  tmpl = block(tmpl);
-  tmpl = options.compress ? compress(tmpl) : tmpl;
-  tmpl = unescape(tmpl)
-    .replace(syntax.INTERPOLATE, (_, code) => `'+(${code}===undefined?'':${code})+'`)
-    .replace(syntax.CONDITIONAL, (_, elseCase, code) => code ?
-      output(elseCase ? `}else if(${code}){` : `if(${code}){`) :
-      output(elseCase ? "}else{" : "}")
-    )
-    .replace(syntax.ITERATIVE, (_, arr, vName, iName) => {
-      if (!arr) return output("}}");
-      const defI = iName ? `let ${iName}=-1;` : "";
-      const incI = iName ? `${iName}++;` : "";
-      return output(`if(${arr}){${defI}for (let ${vName} of ${arr}){${incI}`);
+  const codes = [];
+  tmpl = compress(block(tmpl))
+    .replace(syntax.INTERPOLATE, (_, code) => {
+      codes.push(code);
+      return "'+(" + code + ")+'";
     })
-    .replace(syntax.EVALUATE, (_, code) => `${output(code)}`);
+    .replace(syntax.CONDITIONAL, (_, elseCase, code) => {
+      if (!code) return output(elseCase ? "}else{" : "}");
+      codes.push(code);
+      return output(elseCase ? "}else if(" + code + "){" : "if(" + code + "){");
+    })
+    .replace(syntax.ITERATIVE, (_, arrName, valName, idxName) => {
+      if (!arrName) return output("}}");
+      codes.push(arrName);
+      const defI = idxName ? "let " + idxName + "=-1;" : "";
+      const incI = idxName ? idxName + "++;" : "";
+      return output("if(" + arrName + "){" + defI + "for (let " + valName + " of " + arrName + "){" + incI + "");
+    })
+    .replace(syntax.EVALUATE, (_, code) => {
+      codes.push(code);
+      return output(code + ";");
+    });
 
   let source = ("let out='" + tmpl + "';return out;");
-  source = declare(source) + source;
+  source = declare(codes) + source;
 
   try {
     const fn = new Function("data", source);
@@ -136,11 +142,11 @@ function block(tmpl) {
 
 /**
  * Parse variables as declares in function body header
- * @param {string} source
+ * @param {string} code
  * @returns {string}
  */
-function declare(source) {
-  const varNames = source
+function declare(code) {
+  const varNames = code.join(',')
     .replace(variable.REMOVE, '')
     .replace(variable.SPLIT, ',')
     .replace(variable.KEYWORDS, '')
@@ -151,7 +157,7 @@ function declare(source) {
   const unique = {};
   const prefixVars = [];
   for (const name of varNames) {
-    if (name != "out" && !unique[name]) {
+    if (!unique[name]) {
       unique[name] = true;
       prefixVars.push(name);
     }
@@ -165,25 +171,22 @@ function declare(source) {
 }
 
 /**
- * Strip breaks, tabs and comments
+ * Compress template text
  * @param {string} tmpl
  * @returns {string}
  */
 function compress(tmpl) {
   return tmpl.trim()
     .replace(/<!--[\s\S]*?-->/g, "") // remove html comments
+    .replace(/\/\*[\s\S]*?\*\//g, "") // remove js comments in multiline
     .replace(/\n\s*\/\/.*/g, "") // remove js comments inline
-    .replace(/[\t ]+(\r|\n)/g, "\n") // remove trailing spaces
     .replace(/(\r|\n)[\t ]+/g, "") // remove leading spaces
-    .replace(/\r|\n|\t|\/\*[\s\S]*?\*\//g, "") // remove breaks, tabs and js comments
-}
-
-function unescape(text) {
-  return text.replace(/\\('|\\)/g, "$1").replace(/[\r\t\n]/g, " ");
+    .replace(/[\t ]+(\r|\n)/g, "") // remove trailing spaces
+    .replace(/\r|\n|\t/g, "") // remove breaks and tabs
 }
 
 function output(code) {
-  return `';${code}out+='`;
+  return "';" + code + "out+='";
 }
 
 module.exports = { init, compile, render, view };
