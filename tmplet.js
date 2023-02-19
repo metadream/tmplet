@@ -4,8 +4,7 @@ const { resolve } = require("path");
 /**
  * Tmplet: A compact, high-performance and full-featured template engine
  * Licensed under the MIT license.
- * @Reference https://github.com/olado/doT
- * @Reference https://github.com/ushelp/EasyTemplateJS
+ * @link https://github.com/metadream/tmplet.js
  */
 
 // Template syntax
