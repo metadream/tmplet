@@ -52,13 +52,16 @@ function init(_options) {
  */
 function compile(tmpl) {
   const codes = [];
-  tmpl = compress(block(tmpl))
+  tmpl = block(tmpl);
+  tmpl = escape(reduce(tmpl))
     .replace(syntax.INTERPOLATE, (_, code) => {
+      code = unescape(code);
       codes.push(code);
       return "'+(" + code + ")+'";
     })
     .replace(syntax.CONDITIONAL, (_, elseCase, code) => {
       if (!code) return output(elseCase ? "}else{" : "}");
+      code = unescape(code);
       codes.push(code);
       return output(elseCase ? "}else if(" + code + "){" : "if(" + code + "){");
     })
@@ -70,6 +73,7 @@ function compile(tmpl) {
       return output("if(" + arrName + "){" + defI + "for (let " + valName + " of " + arrName + "){" + incI + "");
     })
     .replace(syntax.EVALUATE, (_, code) => {
+      code = unescape(code);
       codes.push(code);
       return output(code + ";");
     });
@@ -171,11 +175,11 @@ function declare(code) {
 }
 
 /**
- * Compress template text
+ * Reduce template text
  * @param {string} tmpl
  * @returns {string}
  */
-function compress(tmpl) {
+function reduce(tmpl) {
   return tmpl.trim()
     .replace(/<!--[\s\S]*?-->/g, "") // remove html comments
     .replace(/\/\*[\s\S]*?\*\//g, "") // remove js comments in multiline
@@ -183,6 +187,24 @@ function compress(tmpl) {
     .replace(/(\r|\n)[\t ]+/g, "") // remove leading spaces
     .replace(/[\t ]+(\r|\n)/g, "") // remove trailing spaces
     .replace(/\r|\n|\t/g, "") // remove breaks and tabs
+}
+
+/**
+ * Escape backslash and single quotes
+ * @param {string} tmpl
+ * @returns {string}
+ */
+function escape(tmpl) {
+  return tmpl.replace(/\\/g, '\\\\').replace(/\'/g, "\\'");
+}
+
+/**
+ * Unescape single quotes
+ * @param {string} tmpl
+ * @returns {string}
+ */
+function unescape(tmpl) {
+  return tmpl.replace(/\\'/g, '\'');
 }
 
 function output(code) {
