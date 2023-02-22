@@ -1,15 +1,16 @@
 {
   "name": "tmplet",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A compact, high-performance and full-featured template engine.",
   "license": "MIT",
   "author": "Ai Chen",
   "homepage": "https://github.com/metadream",
-  "repository": "https://github.com/metadream/tmplet.js.git",
+  "repository": "https://github.com/metadream/tmplet.git",
   "main": "tmplet.js",
   "keywords": [
     "template",
     "template-engine",
-    "template-js"
+    "template-js",
+    "deno-template"
   ]
 }

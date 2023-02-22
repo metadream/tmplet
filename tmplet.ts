@@ -1,5 +1,5 @@
-const { readFileSync } = require("fs");
-const { resolve } = require("path");
+// deno-lint-ignore-file no-explicit-any
+import { resolve } from "https://deno.land/std@0.177.0/path/mod.ts";
 
 /**
  * Tmplet: A compact, high-performance and full-featured template engine
@@ -28,20 +28,29 @@ const variable = {
   SPLIT2: /^$|,+/
 }
 
+interface Map {
+  [key: string]: any;
+}
+
+interface Options {
+  root: string;
+  imports: any;
+}
+
 // Template engine options
-const options = {
+const options: Options = {
   root: "",
   imports: {}
 }
 
 // Cache template file and compiled function
-const compiledCache = {};
+const compiledCache: Map = {};
 
 /**
  * Initialize custom options
  * @param {object} _options
  */
-function init(_options) {
+function init(_options: Options) {
   Object.assign(options, _options);
 }
 
@@ -50,29 +59,29 @@ function init(_options) {
  * @param {string} tmpl
  * @returns {Function}
  */
-function compile(tmpl) {
-  const codes = [];
+function compile(tmpl: string) {
+  const codes: string[] = [];
   tmpl = block(tmpl);
   tmpl = escape(reduce(tmpl))
-    .replace(syntax.INTERPOLATE, (_, code) => {
+    .replace(syntax.INTERPOLATE, (_: string, code: string) => {
       code = unescape(code);
       codes.push(code);
       return "'+(" + code + ")+'";
     })
-    .replace(syntax.CONDITIONAL, (_, elseCase, code) => {
+    .replace(syntax.CONDITIONAL, (_: string, elseCase: string, code: string) => {
       if (!code) return output(elseCase ? "}else{" : "}");
       code = unescape(code);
       codes.push(code);
       return output(elseCase ? "}else if(" + code + "){" : "if(" + code + "){");
     })
-    .replace(syntax.ITERATIVE, (_, arrName, valName, idxName) => {
+    .replace(syntax.ITERATIVE, (_: string, arrName: string, valName: string, idxName: string) => {
       if (!arrName) return output("}}");
       codes.push(arrName);
       const defI = idxName ? "let " + idxName + "=-1;" : "";
       const incI = idxName ? idxName + "++;" : "";
       return output("if(" + arrName + "){" + defI + "for (let " + valName + " of " + arrName + "){" + incI + "");
     })
-    .replace(syntax.EVALUATE, (_, code) => {
+    .replace(syntax.EVALUATE, (_: string, code: string) => {
       code = unescape(code);
       codes.push(code);
       return output(code + ";");
@@ -83,7 +92,7 @@ function compile(tmpl) {
 
   try {
     const fn = new Function("data", source);
-    return data => {
+    return (data: any) => {
       data = Object.assign({ ...options.imports }, data);
       return fn.call(null, data);
     };
@@ -99,7 +108,7 @@ function compile(tmpl) {
  * @param {object} data
  * @returns {string}
  */
-function render(tmpl, data) {
+function render(tmpl: string, data: any) {
   return compile(tmpl)(data);
 }
 
@@ -109,7 +118,7 @@ function render(tmpl, data) {
  * @param {object} data
  * @returns
  */
-function view(file, data) {
+function view(file: string, data: any) {
   let render = compiledCache[file];
   if (!render) {
     render = compiledCache[file] = compile(include(file));
@@ -122,11 +131,11 @@ function view(file, data) {
  * @param {string} file
  * @returns
  */
-function include(file) {
-  let tmpl = readFileSync(resolve(options.root, file), "utf-8");
+function include(file: string) {
+  let tmpl = Deno.readTextFileSync(resolve(options.root, file));
   while (syntax.PARTIAL.test(tmpl)) {
     tmpl = tmpl.replace(syntax.PARTIAL, (_, _file) => {
-      return readFileSync(resolve(options.root, _file), "utf-8");
+      return Deno.readTextFileSync(resolve(options.root, _file));
     });
   }
   return tmpl;
@@ -137,11 +146,11 @@ function include(file) {
  * @param {string} tmpl
  * @returns
  */
-function block(tmpl) {
-  const blocks = {};
+function block(tmpl: string) {
+  const blocks: Map = {};
   return tmpl
-    .replace(syntax.BLOCK_DEFINE, (_, name, block) => { blocks[name] = block; return ""; })
-    .replace(syntax.BLOCK_HOLDER, (_, name) => blocks[name] || "");
+    .replace(syntax.BLOCK_DEFINE, (_, name: string, block) => { blocks[name] = block; return ""; })
+    .replace(syntax.BLOCK_HOLDER, (_, name: string) => blocks[name] || "");
 }
 
 /**
@@ -149,7 +158,7 @@ function block(tmpl) {
  * @param {Array} codes
  * @returns {string}
  */
-function declare(codes) {
+function declare(codes: string[]) {
   const varNames = codes.join(',')
     .replace(variable.REMOVE, '')
     .replace(variable.SPLIT, ',')
@@ -158,7 +167,7 @@ function declare(codes) {
     .replace(variable.BOUNDARY, '')
     .split(variable.SPLIT2);
 
-  const unique = {};
+  const unique: Map = {};
   const prefixVars = [];
   for (const name of varNames) {
     if (!unique[name]) {
@@ -179,7 +188,7 @@ function declare(codes) {
  * @param {string} tmpl
  * @returns {string}
  */
-function reduce(tmpl) {
+function reduce(tmpl: string) {
   return tmpl.trim()
     .replace(/<!--[\s\S]*?-->/g, "") // remove html comments
     .replace(/\/\*[\s\S]*?\*\//g, "") // remove js comments in multiline
@@ -194,7 +203,7 @@ function reduce(tmpl) {
  * @param {string} tmpl
  * @returns {string}
  */
-function escape(tmpl) {
+function escape(tmpl: string) {
   return tmpl.replace(/\\/g, '\\\\').replace(/\'/g, "\\'");
 }
 
@@ -203,12 +212,12 @@ function escape(tmpl) {
  * @param {string} tmpl
  * @returns {string}
  */
-function unescape(tmpl) {
+function unescape(tmpl: string) {
   return tmpl.replace(/\\'/g, '\'');
 }
 
-function output(code) {
+function output(code: string) {
   return "';" + code + "out+='";
 }
 
-module.exports = { init, compile, render, view };
+export { init, compile, render, view };

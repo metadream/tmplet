@@ -1,27 +1,36 @@
 # Tmplet
-A compact, high-performance and full-featured template engine. References and thanks [doT](https://github.com/olado/doT), [EasyTemplateJS](https://github.com/ushelp/EasyTemplateJS).
+
+A compact, high-performance and full-featured template engine. References and
+thanks [doT](https://github.com/olado/doT),
+[EasyTemplateJS](https://github.com/ushelp/EasyTemplateJS).
 
 ## Imports
 
 ```
 npm i tmplet
 
+// CommonJS
+const tmplet = require("tmplet");
+const { init, compile, render, view } = require("tmplet");
+
 // ES Module
 import * as tmplet from "tmplet";
 import { init, compile, render, view } from "tmplet";
 
-// CommonJS
-const tmplet = require("tmplet");
-const { init, compile, render, view } = require("tmplet");
+// Deno
+import * as tmplet from "https://esm.sh/tmplet/tmplet.ts";
+import { init, compile, render, view } from "https://esm.sh/tmplet/tmplet.ts";
 ```
 
 ## Syntax
 
-- `{{ }}` Evaluate code snippet in javascript end with a semicolon, note that variables do not need to be declared. ex. `{{ result = 60*60; }}`
+- `{{ }}` Evaluate code snippet in javascript end with a semicolon, note that
+  variables do not need to be declared. ex. `{{ result = 60*60; }}`
 
 - `{{= }}` Interpolation. ex. `{{= username }}`
 
 - `{{? }} {{?? }} {{? }}` Conditional statement. ex.
+
 ```
 {{? gender == 0 }}
   <div>Female</div>
@@ -33,6 +42,7 @@ const { init, compile, render, view } = require("tmplet");
 ```
 
 - `{{~ }} {{~ }}` Iterative statement. ex.
+
 ```
 <ul>
 {{~ users:user:index }}
@@ -43,6 +53,7 @@ const { init, compile, render, view } = require("tmplet");
 
 - `{{> }}` Block placeholder.
 - `{{< }}` Block content definition.
+
 ```
 {{> content }}
 
@@ -51,7 +62,9 @@ const { init, compile, render, view } = require("tmplet");
 {{< }}
 ```
 
-- `{{@ }}` Partial including in layout mode. You must be rendered by `view(file, data)` method.
+- `{{@ }}` Partial including in layout mode. You must be rendered by
+  `view(file, data)` method.
+
 ```
 // index.html
 {{@ header.html }}
@@ -75,6 +88,7 @@ const { init, compile, render, view } = require("tmplet");
 ## Methods
 
 - `init(options)` Initialize custom options（not necessary).
+
 ```
 init({
   root: "template", // relative to the project root, default ""
