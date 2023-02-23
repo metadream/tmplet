@@ -24,8 +24,8 @@ import { init, compile, render, view } from "https://esm.sh/tmplet/tmplet.ts";
 
 ## Syntax
 
-- `{{ }}` Evaluate code snippet in javascript end with a semicolon, note that
-  variables do not need to be declared. ex. `{{ result = 60*60; }}`
+- `{{ }}` Evaluate code snippet in javascript. Note that the variables do not
+  need to be declared. ex. `{{ result = 60*60; }}`
 
 - `{{= }}` Interpolation. ex. `{{= username }}`
 
