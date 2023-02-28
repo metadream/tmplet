@@ -18,8 +18,8 @@ import * as tmplet from "tmplet";
 import { init, compile, render, view } from "tmplet";
 
 // Deno
-import * as tmplet from "https://esm.sh/tmplet/tmplet.ts";
-import { init, compile, render, view } from "https://esm.sh/tmplet/tmplet.ts";
+import * as tmplet from "https://deno.land/x/tmplet/tmplet.ts";
+import { init, compile, render, view } from "https://deno.land/x/tmplet/tmplet.ts";
 ```
 
 ## Syntax
